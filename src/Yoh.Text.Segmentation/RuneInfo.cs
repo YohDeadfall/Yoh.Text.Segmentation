@@ -12,7 +12,7 @@ namespace Yoh.Text.Segmentation
         {
             int lo = 0;
             int hi = ranges.Length - 1;
-            
+
             while (lo <= hi)
             {
                 int pivot = lo + ((hi - lo) >> 1);
@@ -29,7 +29,7 @@ namespace Yoh.Text.Segmentation
                     lo = pivot + 1;
                     continue;
                 }
-                
+
                 return range;
             }
 

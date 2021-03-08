@@ -120,7 +120,7 @@ namespace Yoh.Text.Segmentation
                         RuneWordCategory.Numeric => State.Numeric,
                         RuneWordCategory.Katakana => State.Katakana,
                         RuneWordCategory.ExtendNumLet => State.ExtendNumLet,
-                        _ => State.BreakConsumeNone  
+                        _ => State.BreakConsumeNone
                     },
                     State.RegionalIndicatorFull => State.BreakConsumeNone,
                     State.RegionalIndicatorHalf => currentRune.Category == RuneWordCategory.RegionalIndicator
@@ -188,7 +188,9 @@ namespace Yoh.Text.Segmentation
                 }
 
                 if ((state & BreakMask) != default)
+                {
                     break;
+                }
 
             Continue:
                 previousZwt = currentRune.Category == RuneWordCategory.Zwj;
