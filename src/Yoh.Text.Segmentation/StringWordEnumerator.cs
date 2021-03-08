@@ -10,14 +10,12 @@ namespace Yoh.Text.Segmentation
         private ReadOnlySpan<char> _source;
         private ReadOnlySpan<char> _current;
         private RuneCategory _currentRune;
-        private int _currentIndex;
 
         internal StringWordEnumerator(ReadOnlySpan<char> source)
         {
             _source = source;
             _current = default;
             _currentRune = default;
-            _currentIndex = default;
         }
 
         public ReadOnlySpan<char> Current => _current;
@@ -26,7 +24,7 @@ namespace Yoh.Text.Segmentation
 
         public bool MoveNext()
         {
-            if ((uint)_currentIndex >= _source.Length)
+            if (_source.IsEmpty)
             {
                 _current = default;
                 return false;
@@ -34,41 +32,43 @@ namespace Yoh.Text.Segmentation
 
             var state = State.Start;
             var savedRune = default(RuneCategory);
-            int savedIndex = default;
-            int startIndex = _currentIndex;
+            var savedIndex = 0;
 
             var handleFormatExtend = true;
             const State BreakMask = State.BreakConsumeLast | State.BreakConsumeNone;
             const State StateMask = ~BreakMask;
 
-            while (_currentIndex < _source.Length)
-            {
-                var previousCategory = _currentRune.Category;
+            var previousZwt = _currentRune.Category == RuneWordCategory.Zwj;
+            var currentRune = _currentRune;
+            var currentIndex = 0;
 
-                if (_currentRune.Category == RuneWordCategory.None)
-                    _currentRune = DecodeRune(_source);
-                
+            while (currentIndex < _source.Length)
+            {
+                if (currentRune.Category == RuneWordCategory.None)
+                    currentRune = DecodeRune(_source, currentIndex);
+
+                _currentRune = default;
+
                 if (state != State.Start)
                 {
-                    if (_currentRune.Category == RuneWordCategory.Extend ||
-                        _currentRune.Category == RuneWordCategory.Format ||
-                        _currentRune.Category == RuneWordCategory.Zwj)
+                    if (currentRune.Category == RuneWordCategory.Extend ||
+                        currentRune.Category == RuneWordCategory.Format ||
+                        currentRune.Category == RuneWordCategory.Zwj)
                     {
                         handleFormatExtend = false;
-                        continue;
+                        goto Continue;
                     }
                 }
 
-                if (previousCategory == RuneWordCategory.Zwj &&
-                    RuneInfo.IsEmoji(_currentRune.Rune))
+                if (previousZwt && RuneInfo.IsEmoji(currentRune.Rune))
                 {
                     state = State.Emoji;
-                    continue;
+                    goto Continue;
                 }
 
                 state = state switch
                 {
-                    State.Start => _currentRune.Category switch
+                    State.Start => currentRune.Category switch
                     {
                         RuneWordCategory.ALetter => State.AHLetter,
                         RuneWordCategory.HLetter => State.HLetter,
@@ -83,36 +83,37 @@ namespace Yoh.Text.Segmentation
                         RuneWordCategory.Newline => State.BreakConsumeLast,
                         _ => HandleStart(ref this)
                     },
-                    State.AHLetter or State.HLetter => _currentRune.Category switch
+                    State.AHLetter or State.HLetter => currentRune.Category switch
                     {
                         RuneWordCategory.ALetter => State.AHLetter,
                         RuneWordCategory.HLetter => State.HLetter,
                         RuneWordCategory.Numeric => State.Numeric,
                         RuneWordCategory.ExtendNumLet => State.ExtendNumLet,
+                        RuneWordCategory.DoubleQuote when state == State.HLetter => FormatExtend(State.FormatExtendRequireHLetter),
                         RuneWordCategory.SingleQuote when state == State.HLetter => State.FormatExtendAcceptQLetter,
                         RuneWordCategory.SingleQuote or
                         RuneWordCategory.MidLetter or
-                        RuneWordCategory.MidNum => FormatExtend(ref this, State.FormatExtendRequireAHLetter, ref savedRune, ref savedIndex),
+                        RuneWordCategory.MidNumLet => FormatExtend(State.FormatExtendRequireAHLetter),
                         _ => State.BreakConsumeNone | state
                     },
-                    State.Numeric => _currentRune.Category switch
+                    State.Numeric => currentRune.Category switch
                     {
                         RuneWordCategory.ALetter => State.AHLetter,
                         RuneWordCategory.HLetter => State.HLetter,
                         RuneWordCategory.Numeric => State.Numeric,
                         RuneWordCategory.ExtendNumLet => State.ExtendNumLet,
                         RuneWordCategory.SingleQuote or
-                        RuneWordCategory.MidLetter or
-                        RuneWordCategory.MidNum => FormatExtend(ref this, State.FormatExtendRequireNumeric, ref savedRune, ref savedIndex),
+                        RuneWordCategory.MidNum or
+                        RuneWordCategory.MidNumLet => FormatExtend(State.FormatExtendRequireNumeric),
                         _ => State.BreakConsumeNone | state
                     },
-                    State.Katakana => _currentRune.Category switch
+                    State.Katakana => currentRune.Category switch
                     {
                         RuneWordCategory.Katakana => State.Katakana,
                         RuneWordCategory.ExtendNumLet => State.ExtendNumLet,
                         _ => State.BreakConsumeNone
                     },
-                    State.ExtendNumLet => _currentRune.Category switch
+                    State.ExtendNumLet => currentRune.Category switch
                     {
                         RuneWordCategory.ALetter => State.AHLetter,
                         RuneWordCategory.HLetter => State.HLetter,
@@ -122,28 +123,26 @@ namespace Yoh.Text.Segmentation
                         _ => State.BreakConsumeNone  
                     },
                     State.RegionalIndicatorFull => State.BreakConsumeNone,
-                    State.RegionalIndicatorHalf => _currentRune.Category == RuneWordCategory.RegionalIndicator
+                    State.RegionalIndicatorHalf => currentRune.Category == RuneWordCategory.RegionalIndicator
                         ? State.RegionalIndicatorFull
                         : State.BreakConsumeNone,
-                    State.FormatExtendRequireNumeric when _currentRune.Category == RuneWordCategory.Numeric => State.Numeric,
-                    State.FormatExtendRequireAHLetter or State.FormatExtendAcceptQLetter when _currentRune.Category == RuneWordCategory.ALetter => State.AHLetter,
-                    State.FormatExtendRequireAHLetter or State.FormatExtendAcceptQLetter when _currentRune.Category == RuneWordCategory.HLetter => State.HLetter,
-                    State.FormatExtendRequireHLetter when _currentRune.Category == RuneWordCategory.HLetter => State.HLetter,
+                    State.FormatExtendRequireNumeric when currentRune.Category == RuneWordCategory.Numeric => State.Numeric,
+                    State.FormatExtendRequireAHLetter or State.FormatExtendAcceptQLetter when currentRune.Category == RuneWordCategory.ALetter => State.AHLetter,
+                    State.FormatExtendRequireAHLetter or State.FormatExtendAcceptQLetter when currentRune.Category == RuneWordCategory.HLetter => State.HLetter,
+                    State.FormatExtendRequireHLetter when currentRune.Category == RuneWordCategory.HLetter => State.HLetter,
                     State.FormatExtendAcceptNone or State.FormatExtendAcceptQLetter => State.BreakConsumeNone,
-                    State.WSegSpace => _currentRune.Category == RuneWordCategory.WSegSpace && handleFormatExtend
+                    State.WSegSpace => currentRune.Category == RuneWordCategory.WSegSpace && handleFormatExtend
                         ? State.WSegSpace
                         : State.BreakConsumeNone,
                     State.Emoji => State.BreakConsumeNone,
                     State.Zwj => State.BreakConsumeNone,
-                    _ => State.BreakConsumeLast
+                    _ => State.BreakConsumeLast | state
                 };
 
-                if ((state & BreakMask) != default)
-                    break;
-
-                static State HandleStart(ref StringWordEnumerator self)
+                State HandleStart(ref StringWordEnumerator self)
                 {
-                    var rune = DecodeRune(self._source);
+                    var index = currentIndex + currentRune.Length;
+                    var rune = DecodeRune(self._source, index);
                     if (rune.Category == RuneWordCategory.Extend ||
                         rune.Category == RuneWordCategory.Format ||
                         rune.Category == RuneWordCategory.Zwj)
@@ -155,56 +154,73 @@ namespace Yoh.Text.Segmentation
                     return State.BreakConsumeLast;
                 }
 
-                static State HandleStartCr(ref StringWordEnumerator self)
+                State HandleStartCr(ref StringWordEnumerator self)
                 {
-                    var rune = DecodeRune(self._source);
+                    var index = currentIndex + currentRune.Length;
+                    var rune = DecodeRune(self._source, index);
                     if (rune.Category == RuneWordCategory.Lf)
                     {
-                        self._currentRune = default;
-                        self._currentIndex += rune.Rune.Utf8SequenceLength;
+                        currentRune = rune;
+                        currentIndex = index;
                     }
 
-                    return State.BreakConsumeNone;
+                    return State.BreakConsumeLast;
                 }
 
-                static State FormatExtend(ref StringWordEnumerator self, State state, ref RuneCategory savedRune, ref int savedIndex)
+                State FormatExtend(State state)
                 {
                     Debug.Assert(
                         state == State.FormatExtendRequireAHLetter ||
                         state == State.FormatExtendRequireHLetter ||
                         state == State.FormatExtendRequireNumeric);
 
-                    savedRune = self._currentRune;
-                    savedIndex = self._currentIndex;
+                    savedRune = currentRune;
+                    savedIndex = currentIndex;
 
                     return state;
                 }
 
-                static RuneCategory DecodeRune(ReadOnlySpan<char> source)
+                static RuneCategory DecodeRune(ReadOnlySpan<char> source, int index)
                 {
-                    return Rune.DecodeFromUtf16(source, out var rune, out _) == OperationStatus.Done
+                    return Rune.DecodeFromUtf16(source.Slice(index), out var rune, out _) == OperationStatus.Done
                         ? new RuneCategory(rune, RuneInfo.GetWordCategory(rune))
                         : new RuneCategory(rune, RuneWordCategory.Any);
                 }
-            }
 
-            switch (state & StateMask)
-            {
-                case State.AHLetter:
-                case State.HLetter:
-                case State.Numeric:
-                    _currentRune = savedRune;
-                    _currentIndex = savedIndex;
+                if ((state & BreakMask) != default)
                     break;
+
+            Continue:
+                previousZwt = currentRune.Category == RuneWordCategory.Zwj;
+
+                currentIndex += currentRune.Length;
+                currentRune = _currentRune;
             }
 
-            if (state.HasFlag(State.BreakConsumeLast))
+            var stateNoBreak = state & StateMask;
+            if (stateNoBreak == State.FormatExtendRequireAHLetter ||
+                stateNoBreak == State.FormatExtendRequireHLetter ||
+                stateNoBreak == State.FormatExtendRequireNumeric)
             {
-                _currentIndex += _currentRune.Rune.Utf16SequenceLength;
-                _currentRune = default;
+                _currentRune = savedRune;
+                currentIndex = savedIndex;
+            }
+            else
+            {
+                if (state.HasFlag(State.BreakConsumeLast))
+                {
+                    _currentRune = default;
+                    currentIndex += currentRune.Length;
+                }
+                else
+                {
+                    _currentRune = currentRune;
+                }
             }
 
-            _current = _source[startIndex.._currentIndex];
+            _current = _source[0..currentIndex];
+            _source = _source[currentIndex..];
+
             return true;
         }
 
@@ -212,8 +228,6 @@ namespace Yoh.Text.Segmentation
         private enum State
         {
             Start,
-            BreakConsumeLast = 1 << 30,
-            BreakConsumeNone = 1 << 31,
             AHLetter,
             HLetter,
             Numeric,
@@ -231,12 +245,15 @@ namespace Yoh.Text.Segmentation
             Zwj,
             Emoji,
             WSegSpace,
+            BreakConsumeLast = 1 << 30,
+            BreakConsumeNone = 1 << 31,
         }
 
         private readonly struct RuneCategory
         {
-            public readonly Rune Rune;
-            public readonly RuneWordCategory Category;
+            public Rune Rune { get; }
+            public RuneWordCategory Category { get; }
+            public int Length => Rune.Utf16SequenceLength;
 
             public RuneCategory(Rune rune, RuneWordCategory category) =>
                 (Rune, Category) = (rune, category);

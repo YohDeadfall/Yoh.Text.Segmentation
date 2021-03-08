@@ -30,11 +30,6 @@ namespace Yoh.Text.Segmentation.Tests
             }
         }
 
-        public static IEnumerable<object[]> WordsDataDebug { get; } = new[]
-        {
-            new object[] { "\U00000001\U00000001", new [] { "\U00000001", "\U00000001" } },
-        };
-
         // Official Unicode test data
         // http://www.unicode.org/Public/13.0.0/ucd/auxiliary/WordBreakTest.txt
         public static IEnumerable<object[]> WordsData { get; } = new[]
@@ -61,9 +56,9 @@ namespace Yoh.Text.Segmentation.Tests
             new object[] { "\U00000001\U00000308\U00000030", new [] { "\U00000001\U00000308", "\U00000030" } },
             new object[] { "\U00000001\U0000005f", new [] { "\U00000001", "\U0000005f" } },
             new object[] { "\U00000001\U00000308\U0000005f", new [] { "\U00000001\U00000308", "\U0000005f" } },
-            new object[] { "\U00000001\U0001f1e6", new [] { "\U00000001", "\U00001f1e" } },
+            new object[] { "\U00000001\U0001f1e6", new [] { "\U00000001", "\U0001f1e6" } },
             new object[] { "\U00000001\U00000308\U0001f1e6", new [] { "\U00000001\U00000308", "\U0001f1e6" } },
-            new object[] { "\U00000001\U000005d0", new [] { "\U00000001",            "\U000005d0" } },
+            new object[] { "\U00000001\U000005d0", new [] { "\U00000001", "\U000005d0" } },
             new object[] { "\U00000001\U00000308\U000005d0", new [] { "\U00000001\U00000308", "\U000005d0" } },
             new object[] { "\U00000001\U00000022", new [] { "\U00000001", "\U00000022" } },
             new object[] { "\U00000001\U00000308\U00000022", new [] { "\U00000001\U00000308", "\U00000022" } },
@@ -1736,11 +1731,11 @@ namespace Yoh.Text.Segmentation.Tests
             new object[] { "\U00003031\U00003031", new [] { "\U00003031\U00003031" } },
             new object[] { "\U00000041\U0000005f\U00000030\U0000005f\U00003031\U0000005f", new [] { "\U00000041\U0000005f\U00000030\U0000005f\U00003031\U0000005f" } },
             new object[] { "\U00000041\U0000005f\U0000005f\U00000041", new [] { "\U00000041\U0000005f\U0000005f\U00000041" } },
-            new object[] { "\U0001f1e6\U0001f1e7\U0001f6d1\U00000062", new [] { "\U0001f1e6\U0001f1e7", "\U0001f6d1", "\U00000062" } },
-            new object[] { "\U00000061\U0001f1e6\U0001f1e7\U0001f6d1\U00000062", new [] { "\U00000061", "\U0001f1e6\U0001f1e7", "\U0001f6d1", "\U00000062" } },
-            new object[] { "\U00000061\U0001f1e6\U0001f1e7\U0000200d\U0001f6d1\U00000062", new [] { "\U00000061", "\U0001f1e6\U0001f1e7\U0000200d", "\U0001f6d1", "\U00000062" } },
-            new object[] { "\U00000061\U0001f1e6\U0000200d\U0001f1e7\U0001f6d1\U00000062", new [] { "\U00000061", "\U0001f1e6\U0000200d\U0001f1e7", "\U0001f6d1", "\U00000062" } },
-            new object[] { "\U00000061\U0001f1e6\U0001f1e7\U0001f6d1\U0001f1e9\U00000062", new [] { "\U00000061", "\U0001f1e6\U0001f1e7", "\U0001f6d1\U0001f1e9", "\U00000062" } },
+            new object[] { "\U0001f1e6\U0001f1e7\U0001f1e8\U00000062", new [] {"\U0001f1e6\U0001f1e7", "\U0001f1e8", "\U00000062" } },
+            new object[] { "\U00000061\U0001f1e6\U0001f1e7\U0001f1e8\U00000062", new [] {"\U00000061", "\U0001f1e6\U0001f1e7", "\U0001f1e8", "\U00000062" } },
+            new object[] { "\U00000061\U0001f1e6\U0001f1e7\U0000200d\U0001f1e8\U00000062", new [] {"\U00000061", "\U0001f1e6\U0001f1e7\U0000200d", "\U0001f1e8", "\U00000062" } },
+            new object[] { "\U00000061\U0001f1e6\U0000200d\U0001f1e7\U0001f1e8\U00000062", new [] {"\U00000061", "\U0001f1e6\U0000200d\U0001f1e7", "\U0001f1e8", "\U00000062" } },
+            new object[] { "\U00000061\U0001f1e6\U0001f1e7\U0001f1e8\U0001f1e9\U00000062", new [] {"\U00000061", "\U0001f1e6\U0001f1e7", "\U0001f1e8\U0001f1e9", "\U00000062" } },
             new object[] { "\U0001f476\U0001f3ff\U0001f476", new [] { "\U0001f476\U0001f3ff", "\U0001f476" } },
             new object[] { "\U0001f6d1\U0000200d\U0001f6d1", new [] { "\U0001f6d1\U0000200d\U0001f6d1" } },
             new object[] { "\U00000061\U0000200d\U0001f6d1", new [] { "\U00000061\U0000200d\U0001f6d1" } },
