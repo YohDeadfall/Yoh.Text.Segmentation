@@ -5,11 +5,11 @@ VisualStudioVersion = 16.6.30114.105
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{19FB34AF-10B1-486A-8E34-DEB611A3B442}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yoh.Text.Segmentation", "src\Yoh.Text.Segmentation\Yoh.Text.Segmentation.csproj", "{E55A3895-0182-4713-81AA-BC12F297D3E3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yoh.Text.Segmentation", "src\Yoh.Text.Segmentation.csproj", "{E55A3895-0182-4713-81AA-BC12F297D3E3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{2DAC03C3-F193-475A-A947-E01F0DABC411}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yoh.Text.Segmentnation.Tests", "tests\Yoh.Text.Segmentnation.Tests\Yoh.Text.Segmentnation.Tests.csproj", "{32F6A729-25F0-46B7-9005-ECEDD54083C6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yoh.Text.Segmentnation.Tests", "tests\Yoh.Text.Segmentnation.Tests.csproj", "{32F6A729-25F0-46B7-9005-ECEDD54083C6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
