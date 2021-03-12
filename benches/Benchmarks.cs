@@ -1,5 +1,5 @@
-﻿using BenchmarkDotNet;
-using BenchmarkDotNet.Attributes;
+﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Running;
 
 namespace Yoh.Text.Segmentation.Benchmarks
 {
@@ -20,7 +20,7 @@ namespace Yoh.Text.Segmentation.Benchmarks
         }
 
         [Benchmark]
-        public void EnumerateWords()
+        public int EnumerateWords()
         {
             var count = 0;
             foreach (var current in Value.EnumerateWords())
