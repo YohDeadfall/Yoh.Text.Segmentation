@@ -4,13 +4,13 @@ using Xunit;
 
 namespace Yoh.Text.Segmentation.Tests
 {
-    public class StringExtensionsTests
+    public class WordBoundaryEnumeratorTests
     {
         [Theory]
-        [MemberData(nameof(WordsData))]
-        public void EnumerateWords(string input, IEnumerable<string> output)
+        [MemberData(nameof(WordBoundariesData))]
+        public void EnumerateWordBoundaries(string input, IEnumerable<string> output)
         {
-            var actual = input.EnumerateWords().GetEnumerator();
+            var actual = input.EnumerateWordBoundaries().GetEnumerator();
             var expected = output.GetEnumerator();
 
             while (true)
@@ -32,7 +32,7 @@ namespace Yoh.Text.Segmentation.Tests
 
         // Official Unicode test data
         // http://www.unicode.org/Public/13.0.0/ucd/auxiliary/WordBreakTest.txt
-        public static IEnumerable<object[]> WordsData { get; } = new[]
+        public static IEnumerable<object[]> WordBoundariesData { get; } = new[]
         {
             new object[] { "\U00000001\U00000001", new [] { "\U00000001", "\U00000001" } },
             new object[] { "\U00000001\U00000308\U00000001", new [] { "\U00000001\U00000308", "\U00000001" } },

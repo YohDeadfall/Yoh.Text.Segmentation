@@ -5,13 +5,13 @@ using System.Text;
 
 namespace Yoh.Text.Segmentation
 {
-    public ref struct StringWordEnumerator
+    public ref struct WordBoundaryEnumerator
     {
         private ReadOnlySpan<char> _source;
         private ReadOnlySpan<char> _current;
         private RuneCategory _currentRune;
 
-        internal StringWordEnumerator(ReadOnlySpan<char> source)
+        internal WordBoundaryEnumerator(ReadOnlySpan<char> source)
         {
             _source = source;
             _current = default;
@@ -20,7 +20,7 @@ namespace Yoh.Text.Segmentation
 
         public ReadOnlySpan<char> Current => _current;
 
-        public StringWordEnumerator GetEnumerator() => this;
+        public WordBoundaryEnumerator GetEnumerator() => this;
 
         public bool MoveNext()
         {
@@ -139,7 +139,7 @@ namespace Yoh.Text.Segmentation
                     _ => State.BreakConsumeLast | state
                 };
 
-                State HandleStart(ref StringWordEnumerator self)
+                State HandleStart(ref WordBoundaryEnumerator self)
                 {
                     var index = currentIndex + currentRune.Length;
                     var rune = DecodeRune(self._source, index);
@@ -154,7 +154,7 @@ namespace Yoh.Text.Segmentation
                     return State.BreakConsumeLast;
                 }
 
-                State HandleStartCr(ref StringWordEnumerator self)
+                State HandleStartCr(ref WordBoundaryEnumerator self)
                 {
                     var index = currentIndex + currentRune.Length;
                     var rune = DecodeRune(self._source, index);
