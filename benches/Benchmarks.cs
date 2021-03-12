@@ -7,7 +7,7 @@ namespace Yoh.Text.Segmentation.Benchmarks
     {
         public static void Main(string[] args) =>
             BenchmarkRunner.Run<Benchmarks>();
-            
+
         private const string Value = "The quick (“brown”) fox can’t jump 32.3 feet, right?";
 
         [Benchmark]
