@@ -3,6 +3,8 @@ using BenchmarkDotNet.Running;
 
 namespace Yoh.Text.Segmentation.Benchmarks
 {
+    [DisassemblyDiagnoser(printSource: true)]
+    [MemoryDiagnoser]
     public class Benchmarks
     {
         public static void Main(string[] args) =>

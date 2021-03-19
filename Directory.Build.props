@@ -14,9 +14,11 @@
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     
-    <LangVersion>latest</LangVersion>
+    <LangVersion>9.0</LangVersion>
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <DebugType>pdbonly</DebugType>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
 </Project>
