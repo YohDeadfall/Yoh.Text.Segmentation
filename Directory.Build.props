@@ -12,7 +12,6 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     
     <LangVersion>9.0</LangVersion>
     <Nullable>enable</Nullable>
