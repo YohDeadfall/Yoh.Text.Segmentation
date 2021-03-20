@@ -13,13 +13,13 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 3.1.301
+        dotnet-version: 5.0.201
 
     - name: Build
       run: dotnet build -c Release
 
     - name: Test
-      run: dotnet test -c Release
+      run: dotnet test bin -c Release
 
     - name: Formatting
       run: dotnet test --check
