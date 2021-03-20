@@ -10,12 +10,12 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
         
-    - name: Setup .NET
+    - name: Setup .NET for building
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 5.0.201
 
-    - name: Setup .NET
+    - name: Setup .NET got testing
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.406
@@ -27,4 +27,6 @@ jobs:
       run: dotnet test -c Release
 
     - name: Formatting
-      run: dotnet test --check
+      run: 
+        dotnet tool install dotnet-format
+        dotnet format --check
