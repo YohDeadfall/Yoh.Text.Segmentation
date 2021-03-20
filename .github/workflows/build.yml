@@ -19,7 +19,7 @@ jobs:
       run: dotnet build -c Release
 
     - name: Test
-      run: dotnet test bin -c Release
+      run: dotnet test -c Release
 
     - name: Formatting
       run: dotnet test --check
