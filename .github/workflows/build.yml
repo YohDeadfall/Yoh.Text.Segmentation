@@ -28,5 +28,5 @@ jobs:
 
     - name: Formatting
       run: 
-        dotnet tool install dotnet-format
+        dotnet tool install -g dotnet-format
         dotnet format --check
