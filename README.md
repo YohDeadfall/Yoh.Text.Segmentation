@@ -10,7 +10,7 @@ var result = new List<string>();
 foreach (var word in input.EnumerateWords())
     result.Add(word.ToString());
 // This code iterates over words in the specified string and produces:
-// "The", "quick", "brown", "fox", "can’t", "jump", "32.3", "feet", "right"
+// The|quick|brown|fox|can’t|jump|32.3|feet|right
 ```
 
 ## Word boundary iteration
@@ -21,7 +21,5 @@ var result = new List<string>();
 foreach (var word in input.EnumerateWordBoundaries())
     result.Add(word.ToString());
 // This code iterates over words in the specified string and produces:
-// "The", " ", "quick", " ", "(", "“", "brown", "”", ")", " ", "fox", " ",
-// "can’t", " ", "jump", " ", "32.3", " ", "feet", ",", " ", "right", "?"
-
+// The| |quick| |(|“|brown|”|)| |fox| |can’t| |jump| |32.3| |feet|,| |right|?
 ```
